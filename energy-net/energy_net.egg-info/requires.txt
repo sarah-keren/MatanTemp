@@ -1,0 +1,15 @@
+numpy
+scipy
+pandas
+gymnasium
+pyyaml
+torch
+matplotlib
+sb3_contrib
+
+[multi]
+pettingzoo
+
+[test]
+stable-baselines3
+tensorboard
