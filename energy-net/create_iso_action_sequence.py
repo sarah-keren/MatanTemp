@@ -26,7 +26,7 @@ from energy_net.envs import EnergyNetV0  # for raw action_space bounds
 import energy_net.envs.register_envs
 from energy_net.controllers.alternating_wrappers import make_iso_env
 
-
+#--pattern-type taoz --output-file iso_actions.npy --method pattern
 def parse_args():
     parser = argparse.ArgumentParser(description="Generate predefined ISO action sequences")
     parser.add_argument("--use-dispatch", action="store_true",

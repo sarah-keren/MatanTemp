@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 
-FILE_PATH = Path("files_for_demo/iso_actions_intervals.npy")  # update if needed
+FILE_PATH = Path("iso_actions.npy")  # update if needed
 
 def extract_two_prices(obj):
     """
