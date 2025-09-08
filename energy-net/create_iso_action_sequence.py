@@ -33,7 +33,7 @@ def parse_args():
                         help="Include dispatch in ISO action sequence (adds dispatch dimension)")
     parser.add_argument("--output-file", type=str, required=True,
                         help="Path to save the generated action sequence (.npy file)")
-    parser.add_argument("--sequence-length", type=int, default=10000,
+    parser.add_argument("--sequence-length", type=int, default=100000,
                         help="Length of the action sequence to generate")
     parser.add_argument("--method", type=str, choices=["random", "from_policy", "pattern", "yaml_config"],
                         default="random", help="Method to generate actions")
@@ -53,7 +53,7 @@ def parse_args():
                         choices=["CONSTANT", "VARIABLE", "TIME_OF_USE"],
                         help="Cost type for environment creation")
     parser.add_argument("--seed", type=int, default=42, help="Random seed")
-    parser.add_argument("--pattern-type", type=str, choices=["charge_discharge_cycle", "price_responsive", "yaml_config"],
+    parser.add_argument("--pattern-type", type=str, choices=["charge_discharge_cycle", "price_responsive", "yaml_config","taoz"],
                         default="charge_discharge_cycle", help="Type of pattern to generate")
     parser.add_argument("--cycle-length", type=int, default=48,
                         help="Length of a single cycle for pattern generation (default 48 = 1 day)")
@@ -138,8 +138,22 @@ def generate_pattern_actions(pattern_type, sequence_length, cycle_length=48, see
     action_shape = iso_space.shape
     n_dims = action_shape[0]
     raw_env.close()
+    if pattern_type == "taoz":
+        # Simple pattern: taoz
+        np_lines = []
+        cycles_needed = ((sequence_length + cycle_length - 1) // cycle_length)*100
+        pattern = np.concatenate([
+            np.ones(13) * 25.7/86.01,
+            np.ones(7) * 63.13/86.01,
+            np.ones(12) * 86.01/86.01,
+            np.ones(16) * 63.13/86.01
+        ])
+        pattern_vals = np.tile(pattern, cycles_needed)[:sequence_length]
+        pattern_vals = np.clip(pattern_vals, -1, 1)
+        # Broadcast scalar pattern to full action vector
+        actions = np.tile(pattern_vals.reshape(-1,1), (1, n_dims))
 
-    if pattern_type == "charge_discharge_cycle":
+    elif pattern_type == "charge_discharge_cycle":
         # Simple pattern: charge for half cycle, discharge for half cycle
         np_lines = []
         cycles_needed = (sequence_length + cycle_length - 1) // cycle_length
