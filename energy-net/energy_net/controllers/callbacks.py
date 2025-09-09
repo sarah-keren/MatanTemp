@@ -175,10 +175,9 @@ class ActionTrackingCallback(BaseCallback):
         ]  # updated pricing lookup
         reserve_costs = [d.get('reserve_cost', 0.0) for d in episode_data]
 
-        # ===== Redesigned Episode Detail Plot: 3 Panels =====
-        fig, axs = plt.subplots(3, 1, figsize=(15, 18))
-        # Panel 1: Dispatch & Demand
-        ax1 = axs[0]
+        # ===== Episode Detail Plots: Separate Figures =====
+        # Figure: Dispatch & Demand
+        fig_dispatch, ax1 = plt.subplots(figsize=(15, 6))
         ax1.bar(steps, dispatch, width=0.8, color='lightblue', label='Dispatch')
         ax1.plot(steps, predicted_demand, 'k--', linewidth=2, label='Predicted Demand')
         ax1.plot(steps, realized_demand, 'b-', linewidth=2, label='Realized Demand')
@@ -192,9 +191,15 @@ class ActionTrackingCallback(BaseCallback):
             1 for d, nd, rd in zip(dispatch, net_demand, realized_demand)
             if nd < rd and d >= nd
         )
-        ax1.text(0.05, 0.95, f'{self.agent_name} PCS-assisted steps: {good_steps}/{len(net_demand)}', transform=ax1.transAxes, fontsize=12, verticalalignment='top')
-        # Panel 2: ISO Prices
-        ax2 = axs[1]
+        ax1.text(0.05, 0.95, f'{self.agent_name} PCS-assisted steps: {good_steps}/{len(net_demand)}',
+                 transform=ax1.transAxes, fontsize=12, verticalalignment='top')
+        fig_dispatch.tight_layout()
+        dispatch_path = os.path.join(save_path, f'episode_{episode_num}_dispatch_demand.png')
+        fig_dispatch.savefig(dispatch_path, dpi=300, bbox_inches='tight')
+        plt.close(fig_dispatch)
+
+        # Figure: ISO Prices
+        fig_prices, ax2 = plt.subplots(figsize=(15, 6))
         ax2.plot(steps, iso_buy_prices, 'g-', linewidth=2, label='ISO Buy Price')
         ax2.plot(steps, iso_sell_prices, 'r-', linewidth=2, label='ISO Sell Price')
         ax2.set_ylabel('Price ($/MWh)', fontsize=12)
@@ -202,32 +207,32 @@ class ActionTrackingCallback(BaseCallback):
         ax2.grid(True, alpha=0.3)
         ax2.legend(loc='upper right', fontsize=10)
         # Panel 3: Battery & Background Processes
-        ax3 = axs[2]
+        fig_prices.tight_layout()
+        prices_path = os.path.join(save_path, f'episode_{episode_num}_iso_prices.png')
+        fig_prices.savefig(prices_path, dpi=300, bbox_inches='tight')
+        plt.close(fig_prices)
+
+        # Figure: Battery & Background Processes
+        fig_battery, ax3 = plt.subplots(figsize=(15, 6))
         ax3.plot(steps, battery_level, 'b-', linewidth=2, label='Battery Level')
         bg_keys = [k for k in episode_data[0].keys() if isinstance(k, str) and k.startswith('background_')]
         for key in bg_keys:
             values = [d.get(key, 0.0) for d in episode_data]
             label = key.replace('background_', '')
             ax3.plot(steps, values, '--', linewidth=1.5, label=label)
-        # Add PCS buy/sell energy flows on Panel 3
-        pos_pcs_energy = [max(0.0, d.get('net_exchange', 0.0)) for d in episode_data]
-        neg_pcs_energy = [abs(min(0.0, d.get('net_exchange', 0.0))) for d in episode_data]
-        
-        ax3.plot(steps, pos_pcs_energy, '--', color='green', linewidth=1.5, label='PCS Sell (MWh)')
-        ax3.plot(steps, neg_pcs_energy, '--', color='magenta', linewidth=1.5, label='PCS Buy (MWh)')
+
         ax3.set_xlabel('Step', fontsize=12)
         ax3.set_ylabel('MWh', fontsize=12)
         ax3.set_title('Battery & Background Processes', fontsize=14)
         ax3.grid(True, alpha=0.3)
         ax3.legend(loc='upper right', fontsize=10)
-        fig.tight_layout()
-        fig_path = os.path.join(save_path, f'episode_{episode_num}_detail.png')
-        plt.savefig(fig_path, dpi=300, bbox_inches='tight')
-        plt.close(fig)
-        
+        fig_battery.tight_layout()
+        battery_path = os.path.join(save_path, f'episode_{episode_num}_battery_background.png')
+        fig_battery.savefig(battery_path, dpi=300, bbox_inches='tight')
+        plt.close(fig_battery)
         # ===== Figure 2: Cost components only =====
-        fig2 = plt.figure(figsize=(10, 6))
-        ax4 = fig2.add_subplot(1, 1, 1)
+        fig_cost = plt.figure(figsize=(10, 6))
+        ax4 = fig_cost.add_subplot(1, 1, 1)
 
         # Separate positive costs (dispatch, reserve) from negative/positive exchange costs
         # Create separate bars for each cost component
@@ -248,16 +253,16 @@ class ActionTrackingCallback(BaseCallback):
         ax4.set_title('Cost Components Over Time', fontsize=14)
         ax4.grid(True, alpha=0.3)
         ax4.legend(loc='upper right', fontsize=10)
-        
-        fig2.tight_layout()
-        fig_path_2 = os.path.join(save_path, f'episode_{episode_num}_cost_components.png')
-        plt.savefig(fig_path_2, dpi=300, bbox_inches='tight')
-        plt.close()
-        print(f"Saved cost components plot to {fig_path_2}")
+
+        fig_cost.tight_layout()
+        fig_path_cost = os.path.join(save_path, f'episode_{episode_num}_cost_components.png')
+        fig_cost.savefig(fig_path_cost, dpi=300, bbox_inches='tight')
+        plt.close(fig_cost)
+        print(f"Saved cost components plot to {fig_path_cost}")
         
         # ===== Figure 3: Single bar to show final cost distribution =====
-        fig3 = plt.figure(figsize=(6, 8))
-        ax5 = fig3.add_subplot(1, 1, 1)
+        fig_final = plt.figure(figsize=(6, 8))
+        ax5 = fig_final.add_subplot(1, 1, 1)
         
         total_dispatch = sum(dispatch_costs)
         total_pcs = sum(pcs_costs)
@@ -310,11 +315,11 @@ class ActionTrackingCallback(BaseCallback):
         
         # Place legend outside the plot area
         ax5.legend(loc='upper left', bbox_to_anchor=(1, 1), fontsize=10)
-        
-        fig3.tight_layout()
+
+        fig_final.tight_layout()
         final_cost_path = os.path.join(save_path, f'episode_{episode_num}_final_cost_distribution.png')
-        plt.savefig(final_cost_path, dpi=300, bbox_inches='tight')
-        plt.close()
+        fig_final.savefig(final_cost_path, dpi=300, bbox_inches='tight')
+        plt.close(fig_final)
         print(f"Saved final cost distribution plot to {final_cost_path}")
         
         if episode_data and any('pcs_actions' in d for d in episode_data):
@@ -371,7 +376,7 @@ class ActionTrackingCallback(BaseCallback):
         print(f"{mode.capitalize()} runtime info saved to {file_path}")
 
 # The method below matches the format from eval_iso_zoo.py and eval_pcs_zoo.py
-def plot_episode_detail(episode_data, episode_num, output_dir):
+def plot_episode_detail_(episode_data, episode_num, output_dir):
     """
     Plot detailed metrics for a single episode.
     """
@@ -476,7 +481,95 @@ def plot_episode_detail(episode_data, episode_num, output_dir):
     plt.savefig(os.path.join(output_dir, f'episode_{episode_num}_detail.png'), 
                 dpi=300, bbox_inches='tight')
     plt.close()
-    
+
+def plot_episode_detail(episode_data, episode_num, output_dir):
+    """Plot detailed metrics for a single episode."""
+    # Extract data
+    steps = range(len(episode_data))
+
+    # ISO metrics
+    predicted_demands = [d.get("info", {}).get("iso", {}).get("predicted_demands", [0.0])[0]
+                         for d in episode_data]
+    realized_demands = [d.get("info", {}).get("iso", {}).get("realized_demands", [0.0])[0]
+                        for d in episode_data]
+    pcs_demands = [d.get("info", {}).get("iso", {}).get("pcs_demands", [0.0])[0]
+                   for d in episode_data]
+    net_demands = [d.get("info", {}).get("iso", {}).get("net_demands", [0.0])[0]
+                   for d in episode_data]
+    buy_prices = [d.get("info", {}).get("iso", {}).get("buy_prices", [0.0])[0]
+                  for d in episode_data]
+    sell_prices = [d.get("info", {}).get("iso", {}).get("sell_prices", [0.0])[0]
+                   for d in episode_data]
+
+    # PCS metrics
+    battery_levels = [d.get("info", {}).get("pcs", {}).get("battery_levels", [0.0])[0]
+                      for d in episode_data]
+    energy_exchanges = [d.get("info", {}).get("pcs", {}).get("energy_exchanges", [0.0])[0]
+                        for d in episode_data]
+
+    # Dispatch and costs
+    dispatch_costs = [d.get("info", {}).get("iso", {}).get("dispatch_costs", [0.0])[0]
+                      for d in episode_data]
+    reserve_costs = [d.get("info", {}).get("iso", {}).get("reserve_costs", [0.0])[0]
+                     for d in episode_data]
+    dispatch = [d.get("info", {}).get("shared", {}).get("dispatch", 0.0)
+                for d in episode_data]
+
+    # Self-production/consumption (optional detail)
+    self_production = [d.get("info", {}).get("self_production", 0.0) for d in episode_data]
+    self_consumption = [d.get("info", {}).get("self_consumption", 0.0) for d in episode_data]
+
+    # Create figure with three stacked subplots
+    fig, axs = plt.subplots(3, 1, figsize=(14, 18))
+
+    # 1. Demand & generation
+    ax1 = axs[0]
+    ax1.bar(steps, dispatch, color="lightblue", alpha=0.7, label="Dispatch")
+    ax1.plot(steps, predicted_demands, "k--", linewidth=2, label="Predicted Demand")
+    ax1.plot(steps, realized_demands, "b-", linewidth=2, label="Realized Demand")
+    ax1.plot(steps, pcs_demands, "g-", linewidth=2, label="PCS Demand")
+    ax1.plot(steps, net_demands, "r-", linewidth=2, label="Net Demand")
+    ax1.set_ylabel("Power (MW)", fontsize=12)
+    ax1.set_title(f"Episode {episode_num} - Energy Flows", fontsize=14)
+    ax1.grid(True, alpha=0.3)
+    ax1.legend(loc="upper right")
+
+    # 2. Battery levels & exchange
+    ax2 = axs[1]
+    ax2.plot(steps, battery_levels, "g-", linewidth=2, label="Battery Level")
+    ax2.set_ylabel("Battery Level (MWh)", color="g", fontsize=12)
+    ax2.tick_params(axis="y", labelcolor="g")
+    ax2_right = ax2.twinx()
+    ax2_right.plot(steps, energy_exchanges, "b-", linewidth=2, label="Energy Exchange")
+    ax2_right.plot(steps, self_production, "y--", linewidth=1.5, label="Self Production")
+    ax2_right.plot(steps, self_consumption, "m--", linewidth=1.5, label="Self Consumption")
+    ax2_right.axhline(y=0, color="k", linestyle="--", alpha=0.3)
+    ax2_right.set_ylabel("Energy Exchange (MWh)", color="b", fontsize=12)
+    ax2_right.tick_params(axis="y", labelcolor="b")
+    lines1, labels1 = ax2.get_legend_handles_labels()
+    lines2, labels2 = ax2_right.get_legend_handles_labels()
+    ax2.legend(lines1 + lines2, labels1 + labels2, loc="upper right")
+    ax2.set_title("Battery Levels and Energy Exchange", fontsize=14)
+    ax2.grid(True, alpha=0.3)
+
+    # 3. ISO prices
+    ax3 = axs[2]
+    ax3.plot(steps, buy_prices, "r-", linewidth=2, label="Buy Price")
+    ax3.plot(steps, sell_prices, "g-", linewidth=2, label="Sell Price")
+    ax3.fill_between(steps, buy_prices, sell_prices,
+                     where=[b > s for b, s in zip(buy_prices, sell_prices)],
+                     color="gray", alpha=0.3)
+    ax3.set_xlabel("Step", fontsize=12)
+    ax3.set_ylabel("Price ($/MWh)", fontsize=12)
+    ax3.set_title("ISO Prices", fontsize=14)
+    ax3.grid(True, alpha=0.3)
+    ax3.legend(loc="upper right")
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f"episode_{episode_num}_detail.png"),
+                dpi=300, bbox_inches="tight")
+    plt.close()
+
 def plot_iso_prices(episode_data, episode_num, output_dir):
     """
     Plot ISO prices and dispatch costs.

@@ -582,11 +582,11 @@ class PreDefinedISOWrapper(gym.Wrapper):
 
     def step(self, pcs_action):
         # Get normalized ISO action from sequence and unnormalize to real space
-        raw = self.iso_action_sequence[self.current_idx % len(self.iso_action_sequence)]
+        raw = self.iso_action_sequence[self.current_idx %48]# len(self.iso_action_sequence)]
         iso_action = self._unnormalize_iso_action(raw)
         self.current_idx += 1
         self.logger.debug(f"PreDefinedISOWrapper using ISO action: {iso_action}")
-
+        print(f"ISO Action: {raw}-{iso_action}, Current Index: {self.current_idx}")
         action_dict = {"iso": iso_action, "pcs": pcs_action}
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)
 
