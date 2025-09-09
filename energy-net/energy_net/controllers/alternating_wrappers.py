@@ -170,10 +170,12 @@ class ISOEnvWrapper(gym.Wrapper):
         }
         
         self.logger.debug(f"ISOEnvWrapper stepping environment with action_dict: {action_dict}")
-        
+        print(f"ISO Action: {action},  pcs: {pcs_action}")
+
         # Step the environment and get native rewards
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)
-        
+        print(f"obs_dict: {obs_dict},  rewards: {rewards}")
+
         # Store updated PCS observation
         self.last_pcs_obs = obs_dict["pcs"]
         
@@ -334,7 +336,8 @@ class PreDefinedPCSWrapper(ISOEnvWrapper):
         }
         
         self.logger.debug(f"PreDefinedPCSWrapper stepping environment with action_dict: {action_dict}")
-        
+        print(f"ISO Action: {action}, pcs: {pcs_action} Current Index: {self.current_idx}")
+
         # Step the environment
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)
         
@@ -535,7 +538,8 @@ class PCSEnvWrapper(gym.Wrapper):
         }
         
         self.logger.debug(f"PCSEnvWrapper stepping environment with action_dict: {action_dict}")
-        
+        print(f"ISO Action: {action},  pcs: {action}")
+
         # Step the environment and forward its native PCS reward
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)
 
@@ -588,6 +592,7 @@ class PreDefinedISOWrapper(gym.Wrapper):
         self.logger.debug(f"PreDefinedISOWrapper using ISO action: {iso_action}")
         print(f"ISO Action: {raw}-{iso_action}, Current Index: {self.current_idx}")
         action_dict = {"iso": iso_action, "pcs": pcs_action}
+        print(f"ISO Action: {iso_action},  pcs: {pcs_action} Current Index: {self.current_idx}")
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)
 
         # Extract PCS reward
