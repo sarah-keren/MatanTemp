@@ -6,11 +6,13 @@ from stable_baselines3 import TD3
 from energy_net.controllers.alternating_wrappers import make_pcs_env
 
 
-MODEL_PATH = Path("models/ext/td3_pcs_best.zip")
-NORM_PATH = Path("models/ext/td3_pcs_best_norm.pkl")
-
+MODEL_PATH = Path("models/ext/td3_pcs_best-1.zip")
+NORM_PATH = Path("models/ext/td3_pcs_best_norm-1.pkl")
+iso_policy_path = Path("models/ext/td3_iso_best.zip")
 
 def collect_actions(n_steps: int = 5000):
+    iso_policy = TD3.load(iso_policy_path)
+
     env = make_pcs_env(
         steps_per_iteration=4800,
         cost_type="CONSTANT",
@@ -20,6 +22,7 @@ def collect_actions(n_steps: int = 5000):
         use_dispatch_action=True,
         eval_mode=True,
         norm_path=str(NORM_PATH),
+        iso_policy=iso_policy
     )
     model = TD3.load(str(MODEL_PATH))
     model.set_env(env)
@@ -30,6 +33,7 @@ def collect_actions(n_steps: int = 5000):
         print(action)
         actions.append(action[0])
         obs, _, done, _ = env.step(action)
+        print(f"obs: {obs}")
         if done[0]:
             obs = env.reset()
     return np.array(actions)

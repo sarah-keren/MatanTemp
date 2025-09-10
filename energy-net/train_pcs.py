@@ -30,6 +30,10 @@ logging.basicConfig(level=logging.INFO,
 logger = logging.getLogger("pcs_trainer")
 
 
+import matplotlib
+matplotlib.use("Agg")  # or set MPLBACKEND=Agg in the environment
+import matplotlib.pyplot as plt
+
 def parse_args():
     parser = argparse.ArgumentParser(description="Train PCS agent with fixed ISO schedule")
     # Training parameters
@@ -96,6 +100,7 @@ def parse_args():
     parser.add_argument("--norm-path", type=str, default=None,
                         help="Path to VecNormalize stats file for evaluation only")
     return parser.parse_args()
+
 
 
 def main():

@@ -538,7 +538,7 @@ class PCSEnvWrapper(gym.Wrapper):
         }
         
         self.logger.debug(f"PCSEnvWrapper stepping environment with action_dict: {action_dict}")
-        print(f"ISO Action: {action},  pcs: {action}")
+        print(f"ISO Action: {iso_action},  pcs: {action}")
 
         # Step the environment and forward its native PCS reward
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)
@@ -770,6 +770,7 @@ def make_iso_env(
         env.seed(seed)
     
     return env
+
 
 
 def make_pcs_env(
