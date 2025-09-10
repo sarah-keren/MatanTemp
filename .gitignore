@@ -2,3 +2,5 @@ logs/
 *.log 
 energy-net/logs/ 
 energy-net/plots/
+*.pyc
+*.zip
