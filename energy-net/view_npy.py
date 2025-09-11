@@ -178,7 +178,7 @@ if __name__ == "__main__":
     print(pd.DataFrame(arr))
     main()
 
-    arr2= np.load("vladimir/aggregated_actions_clipped.npy")
+    arr2= np.load("vladimir/aggregated_normalized_actions.npy")
     print(pd.DataFrame(arr2))
 
 
