@@ -6,9 +6,9 @@ from stable_baselines3 import TD3
 from energy_net.controllers.alternating_wrappers import make_pcs_env
 
 
-MODEL_PATH = Path("models/ext/td3_pcs_best-1.zip")
-NORM_PATH = Path("models/ext/td3_pcs_best_norm-1.pkl")
-iso_policy_path = Path("models/ext/td3_iso_best.zip")
+MODEL_PATH = Path("vladimir/models/ext/td3_pcs_best-1.zip")
+NORM_PATH = Path("vladimir/models/ext/td3_pcs_best_norm-1.pkl")
+iso_policy_path = Path("vladimir/models/ext/td3_iso_best.zip")
 
 def collect_actions(n_steps: int = 5000):
     iso_policy = TD3.load(iso_policy_path)

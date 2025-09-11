@@ -357,7 +357,7 @@ class PreDefinedPCSWrapper(ISOEnvWrapper):
         }
         
         self.logger.debug(f"PreDefinedPCSWrapper stepping environment with action_dict: {action_dict}")
-        print(f"ISO Action: {action}, pcs: {pcs_action} Current Index: {self.current_idx}")
+        print(f"ISO Action: {action}, pcs: {pcs_action}")
 
         # Step the environment
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)

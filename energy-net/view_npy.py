@@ -106,6 +106,39 @@ def extract_two_prices(obj):
 
     raise ValueError("Could not infer two price series from iso_actions_intervals.npy")
 
+
+def scatter_plot(x, y, labels=("x", "y"), title="Aggregated Actions", out="aggregated_actions.png", show=True):
+    """Generate a scatter plot for aggregated actions.
+
+    Parameters
+    ----------
+    x, y : array-like
+        Data for the horizontal and vertical axes.
+    labels : tuple[str, str], optional
+        Axis labels in the form ``(x_label, y_label)``.
+    title : str, optional
+        Title for the plot. Defaults to ``"Aggregated Actions"``.
+    out : str or Path, optional
+        If provided, the figure is saved to this location.
+    show : bool, optional
+        Whether to display the figure with :func:`matplotlib.pyplot.show`.
+    """
+    x = np.asarray(x, dtype=float)
+    y = np.asarray(y, dtype=float)
+
+    plt.figure()
+    plt.scatter(x, y, alpha=0.7)
+    plt.xlabel(labels[0])
+    plt.ylabel(labels[1])
+    plt.title(title)
+    plt.tight_layout()
+
+    if out is not None:
+        plt.savefig(out, dpi=150)
+        print(f"Saved: {out}")
+    if show:
+        plt.show()
+
 def main():
     data = np.load(FILE_PATH, allow_pickle=True)
     p1, p2, labels = extract_two_prices(data)
@@ -145,6 +178,7 @@ if __name__ == "__main__":
     print(pd.DataFrame(arr))
     main()
 
-    arr2= np.load("aggregated_actions.npy")
+    arr2= np.load("vladimir/aggregated_actions_clipped.npy")
     print(pd.DataFrame(arr2))
+
 
