@@ -117,7 +117,7 @@ class ActionTrackingCallback(BaseCallback):
                 step_data[key] = value
         
         # Debug battery level
-        if self.verbose > 0 and self.steps_in_episode % 10 == 0:
+        if self.verbose > 0 and self.steps_in_episode % 48 == 0:
             print(f"\nStep {self.steps_in_episode} Battery Level: {step_data['battery_level']}")
             if 'pcs' in info:
                 print(f"  From PCS info: {pcs_info.get('battery_level')}")

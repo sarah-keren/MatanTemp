@@ -41,7 +41,9 @@ class ISOEnvWrapper(gym.Wrapper):
     correct sequential order (ISO first, then PCS).
     """
     
-    def __init__(self, env, pcs_policy=None, eval_mode=False):
+    def __init__(self, env, pcs_policy=None, eval_mode=False,
+                 pcs_policies: Optional[Sequence]=None,
+                 pcs_action_sequences: Optional[Sequence[np.ndarray]]=None):
         """
         Initialize the ISO environment wrapper.
         
@@ -51,7 +53,17 @@ class ISOEnvWrapper(gym.Wrapper):
             eval_mode: Whether the wrapper is in evaluation mode
         """
         super().__init__(env)
+        # Normalize inputs to unified lists for aggregation
         self.pcs_policy = pcs_policy
+        self.pcs_policies: List = []
+        if pcs_policy is not None:
+            self.pcs_policies.append(pcs_policy)
+        if pcs_policies:
+            self.pcs_policies.extend(list(pcs_policies))
+        # Sequences are assumed to be in PCS action space already
+        self.pcs_action_sequences: List[np.ndarray] = []
+        if pcs_action_sequences:
+            self.pcs_action_sequences = [np.asarray(seq) for seq in pcs_action_sequences]
         self.eval_mode = eval_mode
         
         # Use only ISO observation and action spaces
@@ -61,6 +73,7 @@ class ISOEnvWrapper(gym.Wrapper):
         # Store last observed state for PCS policy
         self.last_pcs_obs = None
         self.last_iso_action = None
+        self._step_index = 0
         
         # Set up logging
         self.logger = logger
@@ -83,6 +96,7 @@ class ISOEnvWrapper(gym.Wrapper):
         
         # Reset last ISO action
         self.last_iso_action = None
+        self._step_index = 0
         
         return obs_dict["iso"], info
     
@@ -130,38 +144,44 @@ class ISOEnvWrapper(gym.Wrapper):
         
         # (Removed manual controller._process_iso_action to avoid double processing)
 
-        # Get PCS action from policy or use default action
-        if self.pcs_policy is not None and self.last_pcs_obs is not None:
-            try:
-                # Convert to batch format for policy prediction
-                pcs_obs_batch = np.array([self.last_pcs_obs])
-                
-                # Get policy output (normalized in [-1,1])
-                raw_action, _ = self.pcs_policy.predict(
-                    pcs_obs_batch,
-                    deterministic=self.eval_mode  # Deterministic in eval mode
-                )
-                norm_action = raw_action[0]
-                
-                # Epsilon-greedy: with prob epsilon, take a random normalized action
-                if not self.eval_mode and np.random.rand() < self.epsilon:
-                    self.logger.debug(f"Epsilon-greedy: randomizing PCS action (eps={self.epsilon})")
-                    norm_action = np.random.uniform(-1.0, 1.0, size=norm_action.shape)
-                # Unnormalize to original space
-                pcs_action = self._unnormalize_pcs_action(norm_action)
-                
-                self.logger.debug(f"ISOEnvWrapper got PCS action from policy: {pcs_action}")
-            except Exception as e:
-                # Fallback to default action if policy prediction fails
-                self.logger.warning(f"PCS policy prediction failed: {e}, using default action")
-                pcs_action = np.zeros(self.unwrapped.action_space["pcs"].shape)
-        else:
-            # Default action (neutral battery action)
-            pcs_action = np.zeros(self.unwrapped.action_space["pcs"].shape)
-            if self.pcs_policy is None:
-                self.logger.debug(f"ISOEnvWrapper using default PCS action (NO POLICY): {pcs_action}")
-            else:
-                self.logger.warning(f"ISOEnvWrapper using default PCS action (INVALID OBS): obs={self.last_pcs_obs}")
+        # Build aggregated PCS action from multiple sources (policies and/or sequences)
+        pcs_space = self.unwrapped.action_space["pcs"]
+        aggregated = np.zeros(pcs_space.shape, dtype=np.float32)
+
+        # Aggregate policy outputs
+        if self.pcs_policies and self.last_pcs_obs is not None:
+            for idx, policy in enumerate(self.pcs_policies):
+                try:
+                    pcs_obs_batch = np.array([self.last_pcs_obs])
+                    raw_action, _ = policy.predict(
+                        pcs_obs_batch,
+                        deterministic=self.eval_mode
+                    )
+                    norm_action = raw_action[0]
+                    if not self.eval_mode and np.random.rand() < self.epsilon:
+                        norm_action = np.random.uniform(-1.0, 1.0, size=norm_action.shape)
+                    unnorm = self._unnormalize_pcs_action(norm_action)
+                    aggregated += unnorm.astype(np.float32)
+                except Exception as e:
+                    self.logger.warning(f"PCS policy[{idx}] prediction failed: {e}, contributing 0")
+
+        # Aggregate predefined sequences (already in PCS space)
+        if self.pcs_action_sequences:
+            for idx, seq in enumerate(self.pcs_action_sequences):
+                try:
+                    if seq.ndim == 1:
+                        contrib = np.array([seq[self._step_index % len(seq)]], dtype=np.float32)
+                    else:
+                        contrib = seq[self._step_index % len(seq)]
+                        contrib = np.asarray(contrib, dtype=np.float32)
+                    aggregated += contrib
+                except Exception as e:
+                    self.logger.warning(f"PCS sequence[{idx}] access failed: {e}, contributing 0")
+
+        # If nothing contributed, keep zeros
+        # Clip to valid action bounds
+        low, high = pcs_space.low, pcs_space.high
+        pcs_action = np.clip(aggregated, low, high)
         
         # Create joint action dict - ISO must go first!
         action_dict = {
@@ -176,8 +196,9 @@ class ISOEnvWrapper(gym.Wrapper):
         obs_dict, rewards, terminations, truncations, info = self.env.step(action_dict)
         print(f"obs_dict: {obs_dict},  rewards: {rewards}")
 
-        # Store updated PCS observation
+        # Store updated PCS observation and advance step index
         self.last_pcs_obs = obs_dict["pcs"]
+        self._step_index += 1
         
         # Use the environment-provided ISO reward
         if isinstance(rewards, dict):

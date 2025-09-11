@@ -211,6 +211,8 @@ def generate_pattern_actions(pattern_type, sequence_length, cycle_length=48, see
     
     return actions
 
+
+
 def main():
     args = parse_args()
     

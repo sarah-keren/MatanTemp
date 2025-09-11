@@ -117,7 +117,7 @@ class ActionTrackingCallback(BaseCallback):
                 step_data[key] = value
         
         # Debug battery level
-        if self.verbose > 0 and self.steps_in_episode % 10 == 0:
+        if self.verbose > 0 and self.steps_in_episode % 48 == 0:
             print(f"\nStep {self.steps_in_episode} Battery Level: {step_data['battery_level']}")
             if 'pcs' in info:
                 print(f"  From PCS info: {pcs_info.get('battery_level')}")
@@ -372,6 +372,113 @@ class ActionTrackingCallback(BaseCallback):
 
 # The method below matches the format from eval_iso_zoo.py and eval_pcs_zoo.py
 def plot_episode_detail(episode_data, episode_num, output_dir):
+    """
+    Plot detailed metrics for a single episode.
+    """
+    # Extract data
+    steps = range(len(episode_data))
+
+    # Get ISO metrics
+    predicted_demands = [d.get('info', {}).get('iso', {}).get('predicted_demands', [0.0])[0]
+                         for d in episode_data]
+    realized_demands = [d.get('info', {}).get('iso', {}).get('realized_demands', [0.0])[0]
+                        for d in episode_data]
+    pcs_demands = [d.get('info', {}).get('iso', {}).get('pcs_demands', [0.0])[0]
+                   for d in episode_data]
+    net_demands = [d.get('info', {}).get('iso', {}).get('net_demands', [0.0])[0]
+                   for d in episode_data]
+    buy_prices = [d.get('info', {}).get('iso', {}).get('buy_prices', [0.0])[0]
+                  for d in episode_data]
+    sell_prices = [d.get('info', {}).get('iso', {}).get('sell_prices', [0.0])[0]
+                   for d in episode_data]
+
+    # Get PCS metrics
+    battery_levels = [d.get('info', {}).get('pcs', {}).get('battery_levels', [0.0])[0]
+                      for d in episode_data]
+    energy_exchanges = [d.get('info', {}).get('pcs', {}).get('energy_exchanges', [0.0])[0]
+                        for d in episode_data]
+
+    # Get dispatch and costs
+    dispatch_costs = [d.get('info', {}).get('iso', {}).get('dispatch_costs', [0.0])[0]
+                      for d in episode_data]
+    reserve_costs = [d.get('info', {}).get('iso', {}).get('reserve_costs', [0.0])[0]
+                     for d in episode_data]
+    dispatch = [d.get('info', {}).get('shared', {}).get('dispatch', 0.0)
+                for d in episode_data]
+
+    # Extract self production and consumption data for evaluation detail plot
+    self_production = [d.get('info', {}).get('self_production', 0.0) for d in episode_data]
+    self_consumption = [d.get('info', {}).get('self_consumption', 0.0) for d in episode_data]
+
+    # Create figure with subplots
+    fig, axs = plt.subplots(3, 1, figsize=(14, 18))
+
+    # Plot 1: Demand and generation (top subplot)
+    ax1 = axs[0]
+
+    # Dispatch as bars
+    ax1.bar(steps, dispatch, color='lightblue', alpha=0.7, label='Dispatch')
+
+    # Demands as lines
+    ax1.plot(steps, predicted_demands, 'k--', linewidth=2, label='Predicted Demand')
+    ax1.plot(steps, realized_demands, 'b-', linewidth=2, label='Realized Demand')
+    ax1.plot(steps, pcs_demands, 'g-', linewidth=2, label='PCS Demand')
+    ax1.plot(steps, net_demands, 'r-', linewidth=2, label='Net Demand')
+
+    ax1.set_ylabel('Power (MW)', fontsize=12)
+    ax1.set_title(f'Episode {episode_num} - Energy Flows', fontsize=14)
+    ax1.grid(True, alpha=0.3)
+    ax1.legend(loc='upper right')
+
+    # Plot 2: Battery and exchange (middle subplot)
+    ax2 = axs[1]
+
+    # Battery levels on left y-axis
+    ax2.plot(steps, battery_levels, 'g-', linewidth=2, label='Battery Level')
+    ax2.set_ylabel('Battery Level (MWh)', color='g', fontsize=12)
+    ax2.tick_params(axis='y', labelcolor='g')
+
+    # Energy exchange on right y-axis
+    ax2_right = ax2.twinx()
+    ax2_right.plot(steps, energy_exchanges, 'b-', linewidth=2, label='Energy Exchange')
+    ax2_right.plot(steps, self_production, 'y--', linewidth=1.5, label='Self Production')
+    ax2_right.plot(steps, self_consumption, 'm--', linewidth=1.5, label='Self Consumption')
+    ax2_right.axhline(y=0, color='k', linestyle='--', alpha=0.3)
+    ax2_right.set_ylabel('Energy Exchange (MWh)', color='b', fontsize=12)
+    ax2_right.tick_params(axis='y', labelcolor='b')
+
+    # Combine legends
+    lines1, labels1 = ax2.get_legend_handles_labels()
+    lines2, labels2 = ax2_right.get_legend_handles_labels()
+    ax2.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+
+    ax2.set_title('Battery Levels and Energy Exchange', fontsize=14)
+    ax2.grid(True, alpha=0.3)
+
+    # Plot 3: Prices (bottom subplot)
+    ax3 = axs[2]
+
+    ax3.plot(steps, buy_prices, 'r-', linewidth=2, label='Buy Price')
+    ax3.plot(steps, sell_prices, 'g-', linewidth=2, label='Sell Price')
+
+    # Fill the price spread
+    ax3.fill_between(steps, buy_prices, sell_prices,
+                     where=[b > s for b, s in zip(buy_prices, sell_prices)],
+                     color='gray', alpha=0.3)
+
+    ax3.set_xlabel('Step', fontsize=12)
+    ax3.set_ylabel('Price ($/MWh)', fontsize=12)
+    ax3.set_title('ISO Prices', fontsize=14)
+    ax3.grid(True, alpha=0.3)
+    ax3.legend(loc='upper right')
+
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_dir, f'episode_{episode_num}_detail.png'),
+                dpi=300, bbox_inches='tight')
+    plt.close()
+# The method below matches the format from eval_iso_zoo.py and eval_pcs_zoo.py
+# The method below matches the format from eval_iso_zoo.py and eval_pcs_zoo.py
+def plot_episode_detail_(episode_data, episode_num, output_dir):
     """
     Plot detailed metrics for a single episode.
     """
