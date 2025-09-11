@@ -141,7 +141,10 @@ def main():
     print(f"Saved: {out}")
 
 if __name__ == "__main__":
-    arr = np.load("files_for_demo/iso_actions_intervals.npy")
+    arr = np.load("iso_actions.npy")
     print(pd.DataFrame(arr))
     main()
+
+    arr2= np.load("aggregated_actions.npy")
+    print(pd.DataFrame(arr2))
 
