@@ -38,8 +38,8 @@ class ISOReward(BaseReward):
         dispatch = info.get('dispatch', 0.0)
         error = dispatch - realized
 
-        shortage_penalty = 50.0
-        curtailment_penalty = 5.0
+        shortage_penalty = 5.0
+        curtailment_penalty = 50.0
 
         if error > 0:
             # Curtailment case
