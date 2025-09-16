@@ -1,0 +1,137 @@
+Statistical Analysis of ISO Evaluation:
+
+Predicted_non_strategic_demand_MWh:
+  total_across_all_episodes: 3473220.0
+  mean_per_episode: 694644.0
+  std_across_episodes: 0.0
+  min_episode: 694644.0
+  max_episode: 694644.0
+  median_episode: 694644.0
+
+Realized_non_strategic_demand_MWh:
+  total_across_all_episodes: 3475159.0309999175
+  mean_per_episode: 695031.8061999835
+  std_across_episodes: 481.52593662375455
+  min_episode: 694260.6062436907
+  max_episode: 695497.7824203216
+  median_episode: 695118.9680401102
+
+Total_Realized_demand_MWh:
+  total_across_all_episodes: 3475159.0
+  mean_per_episode: 695031.8125
+  std_across_episodes: 481.5293273925781
+  min_episode: 694260.625
+  max_episode: 695497.8125
+  median_episode: 695118.9375
+
+Dispatch_MWh:
+  total_across_all_episodes: 3401077.65625
+  mean_per_episode: 680215.53125
+  std_across_episodes: 0.0
+  min_episode: 680215.53125
+  max_episode: 680215.53125
+  median_episode: 680215.53125
+
+Activated_Reserve_MWh:
+  total_across_all_episodes: 87810.02050803087
+  mean_per_episode: 17562.004101606173
+  std_across_episodes: 416.96018054065814
+  min_episode: 16882.55508610004
+  max_episode: 18017.191156434757
+  median_episode: 17642.382165031573
+
+Power_bought_from_PCS_MWh:
+  total_across_all_episodes: 4400.0
+  mean_per_episode: 880.0
+  std_across_episodes: 0.0
+  min_episode: 880.0
+  max_episode: 880.0
+  median_episode: 880.0
+
+Power_sold_to_PCS_MWh:
+  total_across_all_episodes: 4400.0
+  mean_per_episode: 880.0
+  std_across_episodes: 0.0
+  min_episode: 880.0
+  max_episode: 880.0
+  median_episode: 880.0
+
+Total_power_sold_MWh:
+  total_across_all_episodes: 3479559.0
+  mean_per_episode: 695911.8125
+  std_across_episodes: 481.5293273925781
+  min_episode: 695140.625
+  max_episode: 696377.8125
+  median_episode: 695998.9375
+
+PCS_total_exchange_MWh:
+  total_across_all_episodes: 0.0
+  mean_per_episode: 0.0
+  std_across_episodes: 0.0
+  min_episode: 0.0
+  max_episode: 0.0
+  median_episode: 0.0
+
+ISO_buy_price_$_per_MWh:
+  total_across_all_episodes: 136.63148293892542
+  mean_per_episode: 27.326296587785084
+  std_across_episodes: 0.0
+  min_episode: 27.326296587785084
+  max_episode: 27.326296587785084
+  median_episode: 27.326296587785084
+
+ISO_sell_price_$_per_MWh:
+  total_across_all_episodes: 171.6040000319481
+  mean_per_episode: 34.32080000638962
+  std_across_episodes: 0.0
+  min_episode: 34.32080000638962
+  max_episode: 34.32080000638962
+  median_episode: 34.32080000638962
+
+Dispatch_cost_$_total:
+  total_across_all_episodes: 340107765.625
+  mean_per_episode: 68021553.125
+  std_across_episodes: 0.0
+  min_episode: 68021553.125
+  max_episode: 68021553.125
+  median_episode: 68021553.125
+
+Reserve_cost_$_total:
+  total_across_all_episodes: 26343006.15240926
+  mean_per_episode: 5268601.230481852
+  std_across_episodes: 125088.05416219728
+  min_episode: 5064766.525830013
+  max_episode: 5405157.3469304275
+  median_episode: 5292714.649509472
+
+PCS_exchange_cost_$_total:
+  total_across_all_episodes: 18911128977408.0
+  mean_per_episode: 3782225690624.0
+  std_across_episodes: 0.0
+  min_episode: 3782225690624.0
+  max_episode: 3782225690624.0
+  median_episode: 3782225690624.0
+
+System_cost_$_total:
+  total_across_all_episodes: 18911133171712.0
+  mean_per_episode: 3782226739200.0
+  std_across_episodes: 293085.90625
+  min_episode: 3782226477056.0
+  max_episode: 3782226477056.0
+  median_episode: 3782226477056.0
+
+Curtailment_MWh:
+  total_across_all_episodes: 14570.62890625
+  mean_per_episode: 2914.125732421875
+  std_across_episodes: 327.9865417480469
+  min_episode: 2520.1328125
+  max_episode: 3273.7548828125
+  median_episode: 3008.829345703125
+
+Curtailment_penalty_$_total:
+  total_across_all_episodes: 0.0
+  mean_per_episode: 0.0
+  std_across_episodes: 0.0
+  min_episode: 0.0
+  max_episode: 0.0
+  median_episode: 0.0

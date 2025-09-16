@@ -1,0 +1,137 @@
+Statistical Analysis of ISO Evaluation:
+
+Predicted_non_strategic_demand_MWh:
+  total_across_all_episodes: 3473220.0
+  mean_per_episode: 694644.0
+  std_across_episodes: 0.0
+  min_episode: 694644.0
+  max_episode: 694644.0
+  median_episode: 694644.0
+
+Realized_non_strategic_demand_MWh:
+  total_across_all_episodes: 3471786.950268179
+  mean_per_episode: 694357.3900536358
+  std_across_episodes: 893.8587296658611
+  min_episode: 693345.9140560322
+  max_episode: 695070.9157746128
+  median_episode: 694914.9638659258
+
+Total_Realized_demand_MWh:
+  total_across_all_episodes: 3476637.0
+  mean_per_episode: 695327.375
+  std_across_episodes: 893.8469848632812
+  min_episode: 694315.9375
+  max_episode: 696040.9375
+  median_episode: 695884.9375
+
+Dispatch_MWh:
+  total_across_all_episodes: 3672910.2368164062
+  mean_per_episode: 734582.0473632812
+  std_across_episodes: 0.0
+  min_episode: 734582.0473632812
+  max_episode: 734582.0473632812
+  median_episode: 734582.0473632812
+
+Activated_Reserve_MWh:
+  total_across_all_episodes: 411928.26853752835
+  mean_per_episode: 82385.65370750567
+  std_across_episodes: 519.2367354684254
+  min_episode: 81598.02833154515
+  max_episode: 82915.06919156107
+  median_episode: 82445.05679019449
+
+Power_bought_from_PCS_MWh:
+  total_across_all_episodes: 115149.1328125
+  mean_per_episode: 23029.826171875
+  std_across_episodes: 0.0
+  min_episode: 23029.826171875
+  max_episode: 23029.826171875
+  median_episode: 23029.826171875
+
+Power_sold_to_PCS_MWh:
+  total_across_all_episodes: 119999.1015625
+  mean_per_episode: 23999.8203125
+  std_across_episodes: 0.0
+  min_episode: 23999.8203125
+  max_episode: 23999.8203125
+  median_episode: 23999.8203125
+
+Total_power_sold_MWh:
+  total_across_all_episodes: 3591786.0
+  mean_per_episode: 718357.1875
+  std_across_episodes: 893.8469848632812
+  min_episode: 717345.75
+  max_episode: 719070.75
+  median_episode: 718914.75
+
+PCS_total_exchange_MWh:
+  total_across_all_episodes: 4849.96630859375
+  mean_per_episode: 969.9932861328125
+  std_across_episodes: 0.0
+  min_episode: 969.9932861328125
+  max_episode: 969.9932861328125
+  median_episode: 969.9932861328125
+
+ISO_buy_price_$_per_MWh:
+  total_across_all_episodes: 226.86683932940167
+  mean_per_episode: 45.37336786588033
+  std_across_episodes: 0.0
+  min_episode: 45.37336786588033
+  max_episode: 45.37336786588033
+  median_episode: 45.37336786588033
+
+ISO_sell_price_$_per_MWh:
+  total_across_all_episodes: 74.21203394730885
+  mean_per_episode: 14.842406789461771
+  std_across_episodes: 0.0
+  min_episode: 14.842406789461771
+  max_episode: 14.842406789461771
+  median_episode: 14.842406789461771
+
+Dispatch_cost_$_total:
+  total_across_all_episodes: 367291023.6816406
+  mean_per_episode: 73458204.73632812
+  std_across_episodes: 0.0
+  min_episode: 73458204.73632812
+  max_episode: 73458204.73632812
+  median_episode: 73458204.73632812
+
+Reserve_cost_$_total:
+  total_across_all_episodes: 123578480.56125852
+  mean_per_episode: 24715696.112251706
+  std_across_episodes: 155771.02064052847
+  min_episode: 24479408.499463543
+  max_episode: 24874520.75746832
+  median_episode: 24733517.037058346
+
+PCS_exchange_cost_$_total:
+  total_across_all_episodes: 3.311914840326406e+19
+  mean_per_episode: 6.623829680652812e+18
+  std_across_episodes: 0.0
+  min_episode: 6.623829680652812e+18
+  max_episode: 6.623829680652812e+18
+  median_episode: 6.623829680652812e+18
+
+System_cost_$_total:
+  total_across_all_episodes: 3.311914840326406e+19
+  mean_per_episode: 6.623829680652812e+18
+  std_across_episodes: 0.0
+  min_episode: 6.623829680652812e+18
+  max_episode: 6.623829680652812e+18
+  median_episode: 6.623829680652812e+18
+
+Curtailment_MWh:
+  total_across_all_episodes: 617991.5
+  mean_per_episode: 123598.296875
+  std_across_episodes: 520.264892578125
+  min_episode: 122956.1796875
+  max_episode: 124343.703125
+  median_episode: 123457.4140625
+
+Curtailment_penalty_$_total:
+  total_across_all_episodes: 0.0
+  mean_per_episode: 0.0
+  std_across_episodes: 0.0
+  min_episode: 0.0
+  max_episode: 0.0
+  median_episode: 0.0
